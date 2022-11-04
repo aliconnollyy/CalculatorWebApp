@@ -1,7 +1,3 @@
-def add_in_string(s: str, p, i: int):
-    tp = str(p)
-    return s[:i] + tp + s[i+1:]
-
 def calc(string: str):
     return sep(string)
 
@@ -114,7 +110,7 @@ def sep(equation: str):
     # for each value to be negated, replace the character at that position with '-'    
     for i in range(len(nums)):
         if i in neg_pos:
-            nums = add_in_string(nums, "-", i)
+            nums = nums[:i] + "-" + nums[i+1:]
             
     nums = nums.split(",") # split string by comma delimiter, leaving negative values in
     
