@@ -1,5 +1,19 @@
 from calculator import *
 
+# Testing prec method
+def test_prec():
+    assert prec("+") == 1
+    assert prec("-") == 1
+    assert prec("*") == 2
+    assert prec("/") == 2
+    assert prec("^") == 3
+
+#Testing check_op method
+def test_check_op():
+    assert check_op(1) == ["+", "-"]
+    assert check_op(2) == ["*", "/"]
+    assert check_op(3) == ["^"]
+
 # Testing calc method
 def test_calc():
     ts_1 = "1+2"
