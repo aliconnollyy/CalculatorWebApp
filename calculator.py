@@ -1,3 +1,18 @@
+from time import sleep
+
+
+def main():
+    quit = ("q", "quit", "Q", "QUIT", "exit")
+    while True:
+        ui = input("Please enter your equation. Enter 'q' to quit." + 
+                   "\nUse exp(x) for any equations involving e = 2.718..." + 
+                   "\nUse log for any equations involving loge(x), where e = 2.718...\n\n")
+        if ui in quit:
+            print("Exiting...")
+            sleep(1)
+            break
+        print(calc(ui))
+
 valid_nums = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
 valid_ops = ["+", "-", "*", "/", "^"]
 valid_chars = ["(", ")", "."]
@@ -194,5 +209,5 @@ def calc(equation: str):
         return nums[0]
 
 
-# if __name__ == '__main__':
-    # main()
+if __name__ == '__main__':
+    main()
