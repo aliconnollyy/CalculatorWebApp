@@ -12,23 +12,25 @@ def test_calc():
     ts_8 = "3*3*3*3*3*3*-3*-3*-3"
     ts_9 = "1/2/3"
     ts_10 = "5^7^3"
-    assert calc(ts_1) == 3
-    assert calc(ts_2) == 0
-    assert calc(ts_3) == -1001
-    assert calc(ts_4) == 8
-    assert calc(ts_5) == 1
-    assert calc(ts_6) == 0
-    assert calc(ts_7) == 8
-    assert calc(ts_8) == -19683
-    assert calc(ts_9) == 0
-    assert calc(ts_10) == 476837158203125
+    assert calc(ts_1) == '3'
+    assert calc(ts_2) == '0'
+    assert calc(ts_3) == '-1001'
+    assert calc(ts_4) == '8'
+    assert calc(ts_5) == '1'
+    assert calc(ts_6) == '0'
+    assert calc(ts_7) == '8'
+    assert calc(ts_8) == '-19683'
+    assert calc(ts_9) == '0.167'
+    assert calc(ts_10) == '476837158203125'
     
-    assert calc('10/2') == 5
-    assert calc('4*2-3+5') == 10
-    assert calc('2+3-1') == 4
-    assert calc('3^2') == 9
-    assert calc('3+4^2') == 19
+    assert calc('10/2') == '5.000'
+    assert calc('4*2-3+5') == '10'
+    assert calc('2+3-1') == '4'
+    assert calc('3^2') == '9'
+    assert calc('3+4^2') == '19'
+    assert calc('9/3-8^2+5') == '-56.000'
     assert calc('3/0') == "Invalid: Division by zero"
+    assert calc('20*2/0') == "Invalid: Division by zero"
 
 
 
@@ -46,13 +48,14 @@ def test_sub_calc():
 # Testing validate method
 def test_validate():
     # Testing invalid inputs
-    assert(validate('3+4-1.')) == "Invalid: Can only have integers"
-    assert(validate('.')) == "Invalid: Can only have integers"
+    assert(validate('3+4-1.')) == "Invalid: Cannot end expression with an operator"
+    assert(validate('.')) == "Invalid: Cannot end expression with an operator"
+    assert(validate('4..5')) == "Invalid: invalid position for decimal point (.)"
     assert(validate('+3+4^2')) == "Invalid: Can only have number or \"-\" at beginning of expression"
     assert(validate('5*3+')) == "Invalid: Cannot end expression with an operator"
     assert(validate('4&5-2')) == "Invalid: Contains invalid character: \"&\""
     assert(validate('3*4+++2')) == "Invalid: can't have more than three operators in a row"
-    assert(validate('5+9-2+*)')) == "Invalid: can't have more than three operators in a row"
+    assert(validate('5+9-2+*)')) == "Invalid: Cannot end expression with an operator"
     assert(validate('8+9**2')) == "Invalid: can't have duplicate \"*\" operators in a row"
     assert(validate('3+++3')) == "Invalid: can't have more than three operators in a row"
     assert(validate('5---98')) == "Invalid: can't have more than three operators in a row"
