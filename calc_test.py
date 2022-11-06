@@ -70,7 +70,9 @@ def test_validate():
     assert(validate('4&5-2')) == "Invalid: Contains invalid character: \"&\""
     assert(validate('3*4+++2')) == "Invalid: can't have more than three operators in a row"
     assert(validate('5+9-2+*)')) == "Invalid: Cannot end expression with an operator"
-    assert(validate('8+9**2')) == "Invalid: can't have duplicate \"*\" operators in a row"
+    assert(validate('8+9**2')) == "Invalid: consecutive operator not '+' or '-'"
+    assert(validate('1+2+3^^64')) == "Invalid: consecutive operator not '+' or '-'"
+    assert(validate('1+2/3/6//4')) == "Invalid: consecutive operator not '+' or '-'"
     assert(validate('3+++3')) == "Invalid: can't have more than three operators in a row"
     assert(validate('5---98')) == "Invalid: can't have more than three operators in a row"
     # Testing valid inputs
