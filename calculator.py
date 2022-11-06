@@ -71,7 +71,7 @@ def validate(eq: str):
 
     # check last character of expression
     if eq[-1] in valid_ops or eq[-1] in valid_chars:
-        return "Invalid: Cannot end expression with an operator"
+        return "Invalid: Cannot end expression with an operator or character"
 
     # check for too many adjacent instances of operators
     for i in range(len(eq)):
