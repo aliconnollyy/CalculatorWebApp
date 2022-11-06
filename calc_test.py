@@ -1,5 +1,18 @@
 from calculator import *
 
+# Testing isNum method
+def test_isNum():
+    assert isNum('%') == False
+    assert isNum('/') == False
+    assert isNum('*') == False
+    assert isNum('+') == False
+
+    assert isNum('1') == True
+    assert isNum('8') == True
+    assert isNum('0') == True
+    assert isNum('3.56') == True
+
+
 # Testing prec method
 def test_prec():
     assert prec("+") == 1
@@ -43,6 +56,7 @@ def test_calc():
     assert calc('3^2') == '9'
     assert calc('3+4^2') == '19'
     assert calc('9/3-8^2+5') == '-56.000'
+    assert calc('3.456+3') == '6.456'
     assert calc('3/0') == "Invalid: Division by zero"
     assert calc('20*2/0') == "Invalid: Division by zero"
 
@@ -56,24 +70,30 @@ def test_sub_calc():
     assert sub_calc(4, 6, "-") == -2
     assert sub_calc(4, 6, "+") == 10
     assert sub_calc(4, 6, "^") == 4096
-
+    assert sub_calc(4.25, 8, "+") == 12.25
+    assert sub_calc(6.0, 54.367, "*") == 326.202
+    assert sub_calc(4, 9, "%") == None
 
 
 # Testing validate method
 def test_validate():
-    # Testing invalid inputs
-    assert(validate('3+4-1.')) == "Invalid: Cannot end expression with an operator"
-    assert(validate('.')) == "Invalid: Cannot end expression with an operator"
+    assert(validate('3+4-1.')) == "Invalid: Cannot end expression with an operator or character"
+    assert(validate('.')) == "Invalid: Cannot end expression with an operator or character"
     assert(validate('4..5')) == "Invalid: invalid position for decimal point (.)"
     assert(validate('+3+4^2')) == "Invalid: Can only have number or \"-\" at beginning of expression"
-    assert(validate('5*3+')) == "Invalid: Cannot end expression with an operator"
+    assert(validate('5*3+')) == "Invalid: Cannot end expression with an operator or character"
     assert(validate('4&5-2')) == "Invalid: Contains invalid character: \"&\""
     assert(validate('3*4+++2')) == "Invalid: can't have more than three operators in a row"
-    assert(validate('5+9-2+*)')) == "Invalid: Cannot end expression with an operator"
-    assert(validate('8+9**2')) == "Invalid: can't have duplicate \"*\" operators in a row"
-    assert(validate('3+++3')) == "Invalid: can't have more than three operators in a row"
-    assert(validate('5---98')) == "Invalid: can't have more than three operators in a row"
-    # Testing valid inputs
+    assert(validate('5+9-2+*)')) == "Invalid: Cannot end expression with an operator or character"
+    assert(validate('8+9**2')) == "Invalid: consecutive operator not '+' or '-'"
+    assert(validate('3+--3')) == "Invalid: can't have more than three operators in a row"
+    assert(validate('5-+-98')) == "Invalid: can't have more than three operators in a row"
+    assert(validate('.2+7')) == "Invalid: invalid position for decimal point (.)"
+    assert(validate('45+4.')) == "Invalid: Cannot end expression with an operator or character"
+    assert(validate('3+5.&')) == "Invalid: invalid position for decimal point (.)"
+    assert (validate('7---3')) == "Invalid: can't have more than three operators in a row"
+    assert(validate('8+++4')) == "Invalid: can't have more than three operators in a row"
+   
     assert(validate('4+3*4-1')) == "!4+3*4-1"
     assert(validate('21/3')) == "!21/3"
     assert(validate('2^3')) == "!2^3"
