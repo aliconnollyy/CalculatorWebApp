@@ -148,7 +148,7 @@ def calc(equation: str):
     # eq is now the equation to be worked from to avoid side effects
     for i in range(len(eq)):
         c = eq[i]
-        if not c.isalnum():
+        if c in valid_ops:
             # if the current char is an operator (not a number)
             if i == 0:
                 if c == "-":

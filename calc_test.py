@@ -2,15 +2,15 @@ from calculator import *
 
 # Testing isNum method
 def test_isNum():
-    assert isNum('%') == 0
-    assert isNum('/') == 0
-    assert isNum('*') == 0
-    assert isNum('+') == 0
+    assert isNum('%') == False
+    assert isNum('/') == False
+    assert isNum('*') == False
+    assert isNum('+') == False
 
-    assert('1') == 1
-    assert('8') == 1
-    assert('0') == 1
-    assert('3.56') == 1
+    assert isNum('1') == True
+    assert isNum('8') == True
+    assert isNum('0') == True
+    assert isNum('3.56') == True
 
 
 # Testing prec method
