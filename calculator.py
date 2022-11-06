@@ -78,21 +78,16 @@ def validate(eq: str):
         # check every character invidually now
         if eq[i] not in valid_nums and eq[i] not in valid_ops and eq[i] not in valid_chars:
             return "Invalid: Contains invalid character: \"" + eq[i] + "\""
-        # "+-++-" is invalid
-        if eq[i] in valid_ops and eq[i+1] in valid_ops and eq[i+2] in valid_ops:
-            return "Invalid: can't have more than three operators in a row"
-        # "***..." should be "*", else invalid
-        if eq[i] == "*":
-            if eq[i+1] == "*":
-                return "Invalid: can't have duplicate \"*\" operators in a row"
         if eq[i] == ".":
             if (i == 0 or i == len(eq) - 1) or (isNum(eq[i-1]) and not isNum(eq[i+1])):
                 return "Invalid: invalid position for decimal point (.)"
         # "++++++..." should be "++", else invalid (a + (+b)) = a + b
         # "------..." should be "--", else invalid (a - (-b)) = a + b
-        if (eq[i] == "-" and eq[i+1] == "-") or (eq[i] == "+" and eq[i+1] == "+"):
+        if eq[i] in valid_ops and eq[i+1] in valid_ops:
+            if not eq[i+1] in ('+', '-'):
+                return "Invalid: consecutive operator not '+' or '-'"
             if eq[i+2] in valid_ops:
-                return "Invalid: can't have more than three \"" + eq[i] + "\" operators in a row"
+                return "Invalid: can't have more than three operators in a row"
 
     return "!" + eq
 
