@@ -11,7 +11,7 @@ window_width = 800
 window_height = 400
 dp = 3  # decimal places in the result
 MAX_DP = 50
-MAX_LEN = 100
+MAX_LEN = 65
 dark_mode = False
 default_colour = "#F0F0F0"
 dark_colour = "#333333"
@@ -33,7 +33,7 @@ def user_solve():
             clc.disp_power_disc = False
         else:
             clc_error["text"] = ""
-        if len(clc_result["text"]) >= 17 and len(clc_result["text"]) < MAX_LEN: 
+        if len(clc_result["text"]) > 17 and len(clc_result["text"]) < MAX_LEN: 
             clc_error["text"] = "WARNING: values over 16 digits may return incorrect answers due to floating-point arithmetic error"
         if len(clc_result["text"]) >= MAX_LEN:
             clc_result["text"] = wrap(("{:e}".format(float(ans))), 20)
@@ -57,7 +57,7 @@ def incr_dp():
             clc.disp_power_disc = False
         else:
             clc_error["text"] = ""
-        if len(clc_result["text"]) >= 17 and len(clc_result["text"]) < MAX_LEN: 
+        if len(clc_result["text"]) > 17 and len(clc_result["text"]) < MAX_LEN: 
             clc_error["text"] = "WARNING: values over 16 digits may return incorrect answers due to floating-point arithmetic error"
         if len(clc_result["text"]) >= MAX_LEN:
             clc_result["text"] = wrap(("{:e}".format(float(ans))), 20)
@@ -80,11 +80,10 @@ def decr_dp():
             clc.disp_power_disc = False
         else:
             clc_error["text"] = ""
-        if len(clc_result["text"]) >= 17 and len(clc_result["text"]) < MAX_LEN: 
+        if len(clc_result["text"]) > 17 and len(clc_result["text"]) < MAX_LEN: 
             clc_error["text"] = "WARNING: values over 16 digits may return incorrect answers due to floating-point arithmetic error"
         if len(clc_result["text"]) >= MAX_LEN:
             clc_result["text"] = wrap(("{:e}".format(float(ans))), 20)
-
 
 
 def wrap(string, max_width):
@@ -101,6 +100,47 @@ def wrap(string, max_width):
     return para
 
 
+def invert_colour_mode():
+    global dark_mode
+    dark_mode = not dark_mode
+    if dark_mode:
+        root.config(bg=dark_colour)
+        clc_col_mode.config(bg=default_colour, fg="black")
+        
+        clc_title.config(bg=dark_colour, fg=default_colour)
+        clc_subtitle.config(bg=dark_colour, fg=default_colour)
+        clc_info.config(bg=dark_colour, fg=default_colour)
+        clc_error.config(bg=dark_colour, fg="pink")
+        clc_result.config(bg=dark_colour, fg=default_colour)
+    else:
+        root.config(bg=default_colour)
+        clc_col_mode.config(bg="black", fg=default_colour)
+
+        clc_title.config(bg=default_colour, fg=dark_colour)
+        clc_subtitle.config(bg=default_colour, fg=dark_colour)
+        clc_info.config(bg=default_colour, fg=dark_colour)
+        clc_error.config(bg=default_colour, fg="dark red")
+        clc_result.config(bg=default_colour, fg=dark_colour)
+
+
+###################### USER KEYBOARD FUNCTIONS ######################
+def user_solve_kb(event):
+    user_solve()
+
+
+def incr_dp_kb(event):
+    incr_dp()
+
+
+def decr_dp_kb(event):
+    decr_dp()
+
+
+root.bind('<Return>', user_solve_kb)
+root.bind('<Up>', incr_dp_kb)
+root.bind('<Down>', decr_dp_kb)
+###################### USER KEYBOARD FUNCTIONS ######################
+
 # center of screen
 cx = int(screen_width/2 - window_width/2)
 cy = int(screen_height/3 - window_height/3)
@@ -110,10 +150,19 @@ root.title("Calculator")
 root.geometry(f'{window_width}x{window_height}+{cx}+{cy}')
 root.config(bg=default_colour)
 
-
 clc_eq = tk.Entry(master=root, width=30) # user equation
 
 # All user buttons
+clc_col_mode = tk.Button(
+    master=root,
+    text="\N{BLACK SUN WITH RAYS}",
+    command=invert_colour_mode,
+    width=3,
+    height=2,
+    bg="black",
+    fg=default_colour
+)
+
 clc_calc = tk.Button(
     master=root,
     text="\N{RIGHTWARDS BLACK ARROW}",
@@ -196,6 +245,7 @@ clc_result.place(relx=.8, rely=.375, anchor='center')
 clc_incrdp.place(relx=.685, rely=.35, anchor='center')
 clc_decrdp.place(relx=.915, rely=.35, anchor='center')
 clc_error.place(relx=.5, rely=.45, anchor='center')
+clc_col_mode.place(relx=.95, rely=.9, anchor='center')
 
 
 clc_eq.focus_set()  # focus the equation entry on load
