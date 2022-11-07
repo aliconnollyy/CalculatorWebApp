@@ -2,12 +2,11 @@ from math import e, log
 from time import sleep
 
 
-
 def main():
     quit = ("q", "quit", "Q", "QUIT", "exit")
     while True:
-        ui = input("Please enter your equation. Enter 'q' to quit." + 
-                   "\nUse exp(x) for any equations involving e = 2.718..." + 
+        ui = input("Please enter your equation. Enter 'q' to quit." +
+                   "\nUse exp(x) for any equations involving e = 2.718..." +
                    "\nUse log for any equations involving loge(x), where e = 2.718...\n\n")
         if ui in quit:
             print("Exiting...")
@@ -15,11 +14,13 @@ def main():
             break
         print(solve(ui))
 
+
 valid_nums = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
 valid_ops = ["+", "-", "*", "/", "^"]
 valid_chars = ["(", ")", "."]
 order = [["+", "-"], ["*", "/"], ["^"]]
 euler = str(e)  # euler = e = 2.718281828...
+
 
 def isNum(a):
     return a >= '0' and a <= '9'
@@ -39,6 +40,8 @@ def prec(op):
             return 2
         case "^":
             return 3
+        case _:
+            return -1  # shouldn't be reached if i'm actually good at programming
 
 
 def sub_calc(a, b, op):
@@ -52,9 +55,11 @@ def sub_calc(a, b, op):
         case "/":
             return a/b if b != 0 else None
         case "^":
+            if a == 0 and b == 0:
+                print("NOTE: this is considered undefined on standard calculators.")
             return a**b
         case _:
-            return None
+            return None  # shouldn't be reached due to validate()
 
 
 def validate(eq: str):
@@ -68,10 +73,9 @@ def validate(eq: str):
     # check first character of expression
     if eq[0] in valid_ops and eq[0] != "-":
         return "Invalid: Can only have number or \"-\" (negative) at beginning of expression"
-    
 
     if "(" in eq and ")" not in eq:
-        return "Invalid: Unclosed expression" 
+        return "Invalid: Unclosed expression"
     if ")" in eq and "(" not in eq:
         return "Invalid: Parenthesis closed before opening"
 
@@ -79,7 +83,6 @@ def validate(eq: str):
         return "Invalid: Cannot end expression with an operator"
 
     # check for too many adjacent instances of operators
-    # for i in range(len(eq)):
     i = 0
     while i < len(eq):
         # check every character invidually now
@@ -120,8 +123,70 @@ def solve(eq: str, dp=3) -> str:
     """
     Solves the equation `eq`.
     `dp` refers to how many decimal points are to be shown, defaulting to 3.
+    ---
+    This section deals with parenthesis by picking the innermost pair and performing calc() on its contents,
+    returning the answer to the same string. This is repeated until no parenthesis are left. calc() is performed once more at the end to account for a lack of parenthesis in the total equation.
+
+    e.g.: 8/7^2+5*(8-3)
+    `solve()` starts by finding the first closed bracket [")"] and moving backwards until it finds its opening pair. From there, it takes the substring within the bracket and calculates it using `calc()`.
+
+    `calc()` takes the substring equation (`eq`) and `normalise()`s it, making it easier to use with the rest of `calc()`. In this case, it takes the '8-3' and checks for a character ahead of the '-'. It finds nothing, so it replaces the '-' with '+-' to force the algorithm into accepting that '3' is negative. This makes no difference here, but for an equation such as '8-3*4', '3' would be taken to be negative, which would be wrong.
+
+    Next, the function splits up the equation into lists of numbers and operators. 
+    It sees the '-' and recognises that the value ahead of it, namely '3', is negative, and so adds the index of '3' to a list of values to update as negative later (neg_pos). As `normalise()` replaced the '-' with '+-', there is still a '+' remaining in the string, which is added to the list of operators. Then, all operators are removed from the equation string itself, including brackets, so that it can be split up into numbers. Before it is split up however, the character '-' is added to the each index in neg_pos to mark the following number as negative. Finally, the string is split up by the commas added when removing operators into a list of numbers. The operators were removed by replacing them with commas, but the parenthesis were removed outright, with no replacements.
+
+    Finally, the actual calculation is performed. Going by BIMDAS/BODMAS/PEMDAS (whichever you prefer), the equation is iterated over by finding the highest precedence operator and performing a binary calculation using that operator on the two values either side of it. It then removes the two values from nums (the list of numbers) and the operator from ops (the list of operators) and places the new result in nums at the position of the first value used in the calculation. That is, for example,
+        - nums = [3, 4, 5]
+        - ops = [+, *]
+        - a = 4, b = 5, op = '*'
+        - res = 20
+        - nums = [3, 20]
+        - ops = [+]
+
+    and repeat. This is performed until there is only one value left in nums, which is then returned. The emptiness of ops is assumed due to `validate()` having been performed already before calling `calc()`.
+
+    In the case of our example, the returned result is 5, which is placed back into eq, which now looks like this:
+
+    8/7^2+5*5
+
+    Note that the parenthesis are removed. Now, as there are no more parenthesis left, the entire equation is entered into `calc()` a final time, just to ensure that no calculation is left undone. The same steps as above are performed, with the calculation finding all operators with precedence 3 ('^') and performing their calculations first, then precedence 2, then precedence 1.  Any operators of equal precedence are used as found (left to right). The details of this are laid out as follows:
+        - nums = [8, 7, 2, 5, 5]
+        - ops = [/, ^, +, *]
+        - prec = 3, so op = ^
+        - a = 7, b = 2, op = '^'
+        - res = 49
+        - -
+        - nums = [8, 49, 5, 5]
+        - ops = [/, +, *]
+        - prec = 2, so op ~= ['*', '/']
+        - a = 8, b = 49, op = '/'
+        - res = 0.163...
+        - -
+        - nums = [0.163, 5, 5]
+        - ops = [+, *]
+        - prec = 2, so op ~= ['*', '/']
+        - a = 5, b = 5, op = '*'
+        - res = 25
+        - -
+        - nums = [0.163, 25]
+        - ops = [+]
+        - prec = 1, so op ~= ['+', '-']
+        - a = 0.163, b = 25, op = '+'
+        - res = 25.163...
+        - -
+        - nums = [25.163]
+        - ops = []
+        - -
+
+        => result is 25.163...
+
+    When exp and log are used, the procedure is slightly different but still generally the same. 
+        - When exp is found, the string "exp" is simply replaced with the value of `e`, Euler's constant, and '^', the power operator.
+        - When log is found, the calculation is performed immediately, before the main calculation of the equation string, due to log having no binary operator equivalent. The result is then placed back into the string, replacing log, and the function resumes as normal.
+
+    One final caveat is the event in which the equation contains a substring similar to 'a-b^c'. It was stated above that 'b' should be made to be negative in the case of '8-3*4', but given that '^' is the highest precedence operator, the numbers it uses must be prioritised over negation. As a result, any substring 'a-b^c' does not pre-negate the value 'b' to avoid misinterpreting the equation. 
     """
-    
+
     eq = eq.replace(" ", "")  # remove whitespace
     eq = validate(eq)
     if eq[0] != "!":
@@ -142,9 +207,9 @@ def solve(eq: str, dp=3) -> str:
             eq = eq[:p] + "*" + eq[p:]
             p += 1
             i += 1
-        
+
         small_eq = eq[p+1:i]
-        
+
         ans = calc(small_eq)
         ahead = eq[i+1:]
         i = p + len(ans)
@@ -164,7 +229,7 @@ def solve(eq: str, dp=3) -> str:
 
 def normalise(eq: str) -> str:
     """Takes in a valid equation and normalises it, allowing it to work with calc()"""
-    
+
     for i in range(len(eq)):
         if i < len(eq) - 3:
             if "exp" in eq[i:i+3]:
@@ -177,8 +242,11 @@ def normalise(eq: str) -> str:
                 p = i
                 while p < len(eq) and eq[p] not in valid_ops:
                     p += 1
-                eq = eq[:i] + str(log(float(calc(eq[i+3:p])))) + eq[p:]  # horrible, but necessary
-                # return (True, str(log(float(eq[i+3:]))))
+                try:
+                    # horrible, but necessary
+                    eq = eq[:i] + str(log(float(calc(eq[i+3:p])))) + eq[p:]
+                except:
+                    return "Invalid: log must be positive real number"
 
     teq = eq[0]
     i = 0
@@ -206,10 +274,6 @@ def normalise(eq: str) -> str:
                 # a ++ b == a + b, but a +++ b = invalid
                 # it technically still counts when entered into an actual calculator,
                 # but it is prohibited here based on the rules in `validate()`
-                # w = i
-                # while eq[w+1] == c:
-                #     w += 1
-                # i = w
                 p = c
                 i += 1
             else:
@@ -220,14 +284,25 @@ def normalise(eq: str) -> str:
 
     return teq
 
-def calc(equation: str) -> str:
-    """Calculates the expression and returns the result."""
 
-    nums = []
-    ops = []
+def calc(equation: str) -> str:
+    """Separates the expression into two arrays, calculates the expression and returns the result.\n
+
+    The algorithm forms two arrays, one with the values to be calculated with, and one with
+    the operators. It then collapses the `nums` array by applying each operator in `ops` according to the 
+    order of precedence laid out by the array `oper`. It then returns the last and only value in the array, as all
+    other values have since been removed.
+    """
+
+    nums = []  # numbers in equation
+    ops = []  # operators in equation
     neg_pos = []  # positions to negate characters
 
+    # normalise eq to allow it to work with the rest of this function
     eq = normalise(equation)
+    if eq[0] == 'I':
+        return eq
+    
 
     # eq is now the equation to be worked from to avoid side effects
     for i in range(len(eq)):
@@ -237,18 +312,18 @@ def calc(equation: str) -> str:
             if i == 0:
                 if c == "-":
                     neg_pos.append(0)
-                    # print(c)
-                    continue
-            if not eq[i-1].isalnum():
-                # if the current and prev chars are negative, then this one must be negated
+            elif eq[i-1] in valid_ops:
+                # if the current and prev chars are negative operators, then this one must be negated
                 neg_pos.append(i)
+            elif c in valid_chars:
+                continue
             else:
                 # otherwise this is an operator
                 ops.append(c)
 
     # remove all operators
     nums = eq.replace("+", ",").replace("-", ",").replace("*", ",")
-    nums = nums.replace("/",",").replace("^", ",")
+    nums = nums.replace("/", ",").replace("^", ",")
     nums = nums.replace("(", "").replace(")", "")
 
     # for each value to be negated, replace the character at that position with '-'
@@ -262,11 +337,12 @@ def calc(equation: str) -> str:
 
     # actual calculation
     # calculate all adjacent values left to right, write result in left position, and remove right value
-    # follows order of precedence as defined by the order of operators in ops
+
     try:
         while len(nums) > 1:
             while p_o > 0:
                 # if the set of operators in the equation has at least one of the operators at the current precedence
+                # in other words, while the equation can stay at the current precedence...
                 while not set(ops).isdisjoint(check_op(p_o)):
                     i = 0
                     while i < len(ops):
@@ -278,11 +354,11 @@ def calc(equation: str) -> str:
                             if c == None:
                                 return "Invalid: Division by zero"
                             nums[i] = str(c)
-                            break
-                        i += 1
-                    [nums.remove(p) for p in nums if p == None]
-                    del ops[i]
-                p_o -= 1
+                            [nums.remove(p) for p in nums if p == None]
+                            del ops[i]
+                            i -= 1  # operator was removed from string, so index is decreased
+                        i += 1  # if operator wasn't removed, continue
+                p_o -= 1  # decrease precedence orderer
     except ValueError:
         return "Invalid: Result too large"
 
