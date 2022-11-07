@@ -74,9 +74,9 @@ def validate(eq: str):
     if eq[0] in valid_ops and eq[0] != "-":
         return "Invalid: Can only have number or \"-\" (negative) at beginning of expression"
 
-    if "(" in eq and ")" not in eq:
+    if eq.count('(') > eq.count(')'):
         return "Invalid: Unclosed expression"
-    if ")" in eq and "(" not in eq:
+    if eq.count('(') < eq.count(')'):
         return "Invalid: Parenthesis closed before opening"
 
     if eq[-1] in valid_ops and not eq[-1] == ")":

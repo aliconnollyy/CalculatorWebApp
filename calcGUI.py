@@ -64,26 +64,53 @@ clc_calc = tk.Button(
     bg="green"
 )
 
+# Fonts
+ttl_font = tkFont.Font(family='Yu Gothic', size=30, weight="normal")
+sttl_font = tkFont.Font(family='Yu Gothic', size=12, weight="normal")
+btn_font = tkFont.Font(family='Yu Gothic', size=12, weight="bold")
+
 # Labels
 clc_title = tk.Label(
-    master=root,
-    text="Group 19 Calculator",
-    bg=default_colour,
-    font=("Segoe UI", 30)
-    )
+    master=root, 
+    text="Group 19 Calculator", 
+    bg=default_colour, 
+    font=ttl_font)
 
 clc_subtitle = tk.Label(
-    master=root,
-    text="To start, please enter an equation in the box below.",
+    master=root, 
+    text="To start, please enter an equation in the box below.", 
+    font=sttl_font, 
     bg=default_colour)
 
+clc_info = tk.Label(
+    master=root, text="""
+You may use 
+'+' for addition,
+'-' for subtraction,
+'*' for multiplciation,
+'/' for division,
+'^' for exponentiation,
+'log(x)' for log (base e) (x) calculations, and 
+'exp(x)' for e^x calculations.
+Parentheses '()' are also allowed.
 
-clc_result = tk.Label(master=root, text=empty_response,font=("Segoe UI", 11), bg=default_colour)
+Click the green button to evaluate your expression, 
+and the arrow buttons to change the number of decimal places shown.
+""",
+font=sttl_font,
+bg=default_colour
+)
+
+
+clc_info.config(font=("Yu Gothic", 10), justify="left")
+clc_result = tk.Label(master=root, text=empty_response, font=("Segoe UI", 11), bg=default_colour)
 clc_error = tk.Label(master=root, text="", bg=default_colour, fg="dark red")
+clc_calc.config(font=btn_font)
 
 ###################### POSITIONING ALL WIDGETS ######################
 clc_title.place(relx=0.5, rely=.1, anchor='center')
 clc_subtitle.place(relx=0.5, rely=.2, anchor='center')
+clc_info.place(relx=0.28, rely=.7, anchor='center')
 clc_eq.place(relx=.2, rely=.35, anchor='center')
 clc_calc.place(relx=.5, rely=.35, anchor='center')
 clc_result.place(relx=.8, rely=.375, anchor='center')
