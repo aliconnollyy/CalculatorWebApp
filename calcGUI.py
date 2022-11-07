@@ -9,6 +9,9 @@ root = tk.Tk()
 
 window_width = 800
 window_height = 400
+dp = 3  # decimal places in the result
+MAX_DP = 50
+MAX_LEN = 100
 dark_mode = False
 default_colour = "#F0F0F0"
 dark_colour = "#333333"
@@ -25,7 +28,63 @@ def user_solve():
         clc_error["text"] = ans
     else:
         clc_result["text"] = wrap(ans, 20)
-        clc_error["text"] = empty_response
+        if clc.disp_power_disc:
+            clc_error["text"] = "NOTE: this is considered undefined on standard calculators."
+            clc.disp_power_disc = False
+        else:
+            clc_error["text"] = ""
+        if len(clc_result["text"]) >= 17 and len(clc_result["text"]) < MAX_LEN: 
+            clc_error["text"] = "WARNING: values over 16 digits may return incorrect answers due to floating-point arithmetic error"
+        if len(clc_result["text"]) >= MAX_LEN:
+            clc_result["text"] = wrap(("{:e}".format(float(ans))), 20)
+    global dp
+    dp = 3
+
+
+def incr_dp():
+    global dp
+    eq = clc_eq.get()
+    ans = clc.solve(eq)
+    if ans[0] == "I":
+        clc_result["text"] = empty_response
+        clc_error["text"] = ans
+    else:
+        if dp < MAX_DP:
+            dp += 1
+        clc_result["text"] = wrap(clc.solve(eq, dp), 20)
+        if clc.disp_power_disc:
+            clc_error["text"] = "NOTE: this is considered undefined on standard calculators."
+            clc.disp_power_disc = False
+        else:
+            clc_error["text"] = ""
+        if len(clc_result["text"]) >= 17 and len(clc_result["text"]) < MAX_LEN: 
+            clc_error["text"] = "WARNING: values over 16 digits may return incorrect answers due to floating-point arithmetic error"
+        if len(clc_result["text"]) >= MAX_LEN:
+            clc_result["text"] = wrap(("{:e}".format(float(ans))), 20)
+
+
+
+def decr_dp():
+    global dp
+    eq = clc_eq.get()
+    ans = clc.solve(eq)
+    if ans[0] == "I":
+        clc_result["text"] = empty_response
+        clc_error["text"] = ans
+    else:
+        if dp > 0:
+            dp -= 1
+        clc_result["text"] = wrap(clc.solve(eq, dp), 20)
+        if clc.disp_power_disc:
+            clc_error["text"] = "NOTE: this is considered undefined on standard calculators."
+            clc.disp_power_disc = False
+        else:
+            clc_error["text"] = ""
+        if len(clc_result["text"]) >= 17 and len(clc_result["text"]) < MAX_LEN: 
+            clc_error["text"] = "WARNING: values over 16 digits may return incorrect answers due to floating-point arithmetic error"
+        if len(clc_result["text"]) >= MAX_LEN:
+            clc_result["text"] = wrap(("{:e}".format(float(ans))), 20)
+
 
 
 def wrap(string, max_width):
@@ -62,6 +121,24 @@ clc_calc = tk.Button(
     width=8,
     height=1,
     bg="green"
+)
+
+clc_decrdp = tk.Button(
+    master=root,
+    text="\N{DOWNWARDS BLACK ARROW}",
+    command=decr_dp,
+    width=1,
+    height=1,
+    bg="grey"
+)
+
+clc_incrdp = tk.Button(
+    master=root,
+    text="\N{UPWARDS BLACK ARROW}",
+    command=incr_dp,
+    width=1,
+    height=1,
+    bg="grey"
 )
 
 # Fonts
@@ -106,6 +183,8 @@ clc_info.config(font=("Yu Gothic", 10), justify="left")
 clc_result = tk.Label(master=root, text=empty_response, font=("Segoe UI", 11), bg=default_colour)
 clc_error = tk.Label(master=root, text="", bg=default_colour, fg="dark red")
 clc_calc.config(font=btn_font)
+clc_incrdp.config(font=btn_font)
+clc_decrdp.config(font=btn_font)
 
 ###################### POSITIONING ALL WIDGETS ######################
 clc_title.place(relx=0.5, rely=.1, anchor='center')
@@ -114,6 +193,8 @@ clc_info.place(relx=0.28, rely=.7, anchor='center')
 clc_eq.place(relx=.2, rely=.35, anchor='center')
 clc_calc.place(relx=.5, rely=.35, anchor='center')
 clc_result.place(relx=.8, rely=.375, anchor='center')
+clc_incrdp.place(relx=.685, rely=.35, anchor='center')
+clc_decrdp.place(relx=.915, rely=.35, anchor='center')
 clc_error.place(relx=.5, rely=.45, anchor='center')
 
 

@@ -20,8 +20,7 @@ valid_ops = ["+", "-", "*", "/", "^"]
 valid_chars = ["(", ")", "."]
 order = [["+", "-"], ["*", "/"], ["^"]]
 euler = str(e)  # euler = e = 2.718281828...
-
-
+disp_power_disc = False # display power discrepancy (0^0 returns 1, but should return an error)
 def isNum(a):
     return a >= '0' and a <= '9'
 
@@ -45,6 +44,7 @@ def prec(op):
 
 
 def sub_calc(a, b, op):
+    global disp_power_disc
     match op:
         case "+":
             return a+b
@@ -56,7 +56,7 @@ def sub_calc(a, b, op):
             return a/b if b != 0 else None
         case "^":
             if a == 0 and b == 0:
-                print("NOTE: this is considered undefined on standard calculators.")
+                disp_power_disc = True
             return a**b
         case _:
             return None  # shouldn't be reached due to validate()
