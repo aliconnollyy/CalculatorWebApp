@@ -232,6 +232,10 @@ def normalise(eq: str) -> str:
 
     for i in range(len(eq)):
         if i < len(eq) - 3:
+            if eq[i:i+3] in ("exp", "log"):
+                if i > 0 and isNum(eq[i-1]):
+                    eq = eq[:i] + "*" + eq[i:]
+                    i += 1
             if "exp" in eq[i:i+3]:
                 # exp must use a minimum of 6 characters (e.g. len("exp(a)") == 6)
                 eq = eq[:i] + euler + "^" + eq[i+3:]
