@@ -92,7 +92,7 @@ def validate(eq: str):
             if not eq[i+1] in ('+', '-'):
                 return "Invalid: Consecutive operator not '+' or '-'"
             if eq[i+2] in valid_ops:
-                return "Invalid: Can't have more than three \"" + eq[i] + "\" operators in a row"
+                return "Invalid: Can't have more than three operators in a row"
         if eq[i] == ".":
             if (i == 0 or i == len(eq) - 1) or (isNum(eq[i-1]) and not isNum(eq[i+1])):
                 return "Invalid: Illegal position for decimal point (.)"
@@ -278,7 +278,7 @@ def normalise(eq: str) -> str:
         c = eq[i]
         p = ""
         if i != 0:
-            if c == "-" and eq[i+1].isalnum() and eq[i-1].isalnum():
+            if c == "-" and isNum(eq[i+1]) and isNum(eq[i-1]):
                 # given an equation x - y * z, the program will assume y to be positive when multplying.
                 # this loop takes any negative value and, as long as it isn't at the beginning, changes it from
                 # - to +-
@@ -288,7 +288,7 @@ def normalise(eq: str) -> str:
                 # the operator in front of it is the exponent
                 # e.g., a-b^c = a - (b^c).
                 q = i+1
-                while q < len(eq) and (eq[q].isalnum() or eq[q] == "."):
+                while q < len(eq) and (isNum(eq[q]) or eq[q] == "."):
                     q += 1
                 if q != len(eq) and eq[q] != "^":
                     p = "+-"
