@@ -21,6 +21,8 @@ valid_chars = ["(", ")", "."]
 order = [["+", "-"], ["*", "/"], ["^"]]
 euler = str(e)  # euler = e = 2.718281828...
 disp_power_disc = False # display power discrepancy (0^0 returns 1, but should return an error)
+
+
 def isNum(a):
     return a >= '0' and a <= '9'
 
@@ -55,8 +57,7 @@ def sub_calc(a, b, op):
         case "/":
             return a/b if b != 0 else None
         case "^":
-            if a == 0 and b == 0:
-                disp_power_disc = True
+            disp_power_disc = a == 0 and b == 0
             return a**b
         case _:
             return None  # shouldn't be reached due to validate()
@@ -102,7 +103,7 @@ def validate(eq: str):
         if i > 0 and eq[i] == ")" and eq[i-1] in valid_ops:
             return "Invalid: Parenthesis cannot end with an operator"
         if i < len(eq) - 1 and eq[i] == "(" and eq[i+1] == ")":
-            return "Invalid: Empty parenthesis"
+            return "Invalid: Empty parentheses"
         if i < len(eq) - 3:
             if eq[i:i+3] in ("exp", "log"):
                 t_op = eq[i:i+3]
@@ -110,7 +111,7 @@ def validate(eq: str):
                     return "Invalid: Unary operator " + t_op + " must enclose its parameter in brackets (e.g. " + t_op + "(4))"
                 i += 3  # continue past "exp(" or "log("
                 if eq[i+1] == ")":
-                    return "Invalid: Empty parenthesis"
+                    return "Invalid: Empty parentheses"
         if eq[i] not in valid_nums and eq[i] not in valid_ops and eq[i] not in valid_chars:
             return "Invalid: Contains invalid character: \"" + eq[i] + "\""
 
@@ -124,9 +125,9 @@ def solve(eq: str, dp=3) -> str:
     Solves the equation `eq`.
     `dp` refers to how many decimal points are to be shown, defaulting to 3.
     ---
-    This section deals with parenthesis by picking the innermost pair and performing calc() on its contents,
-    returning the answer to the same string. This is repeated until no parenthesis are left. calc() is performed once more at the end to account for a lack of
-    parenthesis in the total equation.
+    This section deals with parentheses by picking the innermost pair and performing calc() on its contents,
+    returning the answer to the same string. This is repeated until no parentheses are left. calc() is performed once more at the end to account for a lack of
+    parentheses in the total equation.
 
     e.g.: 8/7^2+5*(8-3)
     `solve()` starts by finding the first closed bracket [")"] and moving backwards until it finds its opening pair. From there, it takes the substring within 
@@ -141,7 +142,7 @@ def solve(eq: str, dp=3) -> str:
     later (neg_pos). As `normalise()` replaced the '-' with '+-', there is still a '+' remaining in the string, which is added to the list of operators. Then, 
     all operators are removed from the equation string itself, including brackets, so that it can be split up into numbers. Before it is split up however, the 
     character '-' is added to the each index in neg_pos to mark the following number as negative. Finally, the string is split up by the commas added when 
-    removing operators into a list of numbers. The operators were removed by replacing them with commas, but the parenthesis were removed outright, with no 
+    removing operators into a list of numbers. The operators were removed by replacing them with commas, but the parentheses were removed outright, with no 
     replacements.
 
     Finally, the actual calculation is performed. Going by BIMDAS/BODMAS/PEMDAS (whichever you prefer), the equation is iterated over by finding the highest 
@@ -162,7 +163,7 @@ def solve(eq: str, dp=3) -> str:
 
     8/7^2+5*5
 
-    Note that the parenthesis are removed. Now, as there are no more parenthesis left, the entire equation is entered into `calc()` a final time, just to 
+    Note that the parentheses are removed. Now, as there are no more parentheses left, the entire equation is entered into `calc()` a final time, just to 
     ensure that no calculation is left undone. The same steps as above are performed, with the calculation finding all operators with precedence 3 ('^') and 
     performing their calculations first, then precedence 2, then precedence 1.  Any operators of equal precedence are used as found (left to right). The 
     details of this are laid out as follows:
@@ -234,7 +235,7 @@ def solve(eq: str, dp=3) -> str:
         i = p + len(ans)
         eq = eq[:p] + ans + ahead
 
-    # Recurse through the equation if there are still parenthesis in it
+    # Recurse through the equation if there are still parentheses in it
     if "(" in eq and ")" in eq:
         eq = solve(eq, dp=dp)
 
