@@ -34,7 +34,7 @@ If you've downloaded the files locally, you don't need PuTTy or an X Server, tho
     python ./calcGUI.py
 
 ## To run using a Dockerfile (containerisation)
-If you've pulled this module from Docker Hub, you can launch the calculator by first building the image with 
+To containerise this code, you can launch the calculator by first building the image with 
 
     docker build -t [image name] .
 
@@ -45,8 +45,13 @@ Then you can run the image in a container using
 Both the image and container names are arbitrary. 
 
 ## To run from Docker Hub
-To run directly from Docker Hub, you can use the command
+To run from Docker Hub, you can use the command
 
-    docker run -ti -d --rm -e DISPLAY=host.docker.internal:0.0 --name [container name] acc_name/image_name:version_name
+    docker pull aliconnolly/interactive_calculator:latest
+    
+to pull the image, and the command
 
-Now you can enjoy the calculator :)
+    docker run -ti -d --rm -e DISPLAY=host.docker.internal:0.0 --name [container name] aliconnolly/interactive_calculator:latest
+
+to run the image. 
+
