@@ -57,6 +57,21 @@ def test_calc():
     assert calc('3+4^2') == '19'
     assert calc('9/3-8^2+5') == '-56.000'
     assert calc('3.456+3') == '6.456'
+
+    assert(calc('4+3*4-1')) == "15"
+    assert(calc('21/3')) == "7"
+    assert(calc('2^3')) == "8"
+    assert(calc('9++8')) == "17"
+    assert(calc('3--1')) == "4"
+    assert(calc('log(5)')) == "0.699"
+    assert(calc('exp(4)')) == "54.598"
+    assert(calc('(3*4)+3')) == "15"
+    assert(calc('(log(3)+4)-2')) == "2.477"
+    assert(calc('3+5*exp(4.2)/(5+7)')) == "30.786"
+    assert(calc('(12.344754 + 5) * exp(4)')) == "946.991"
+    assert(calc('(634.4982938 - 45.19283473) + log(8)')) == "590.209"
+
+    assert(calc('2^19237')) == "Invalid: Result too large"
     assert calc('3/0') == "Invalid: Division by zero"
     assert calc('20*2/0') == "Invalid: Division by zero"
 
@@ -93,9 +108,26 @@ def test_validate():
     assert(validate('3+5.&')) == "Invalid: invalid position for decimal point (.)"
     assert (validate('7---3')) == "Invalid: can't have more than three operators in a row"
     assert(validate('8+++4')) == "Invalid: can't have more than three operators in a row"
+    assert(validate('(3+5)5')) == "Invalid: Number after parenthesis has no preceeding operator"
+    assert(validate('(+4-1)+4')) == "Invalid: Parenthesis cannot start with an operator"
+    assert(validate('((6/2)-3*)')) == "Invalid: Parenthesis cannot end with an operator"
+    assert(validate('()')) == "Invalid: Empty parenthesis"
+    assert(validate('log4')) == "Invalid: Unary operator log must enclose its parameter in brackets (e.g. log(4))"
+    assert(validate('exp3.5')) == "Invalid: Unary operator exp must enclose its parameter in brackets (e.g. exp(4))"
+    assert(validate('exp()')) == "Invalid: Empty parenthesis"
+    assert(validate('log()')) == "Invalid: Empty parenthesis"
+    assert(validate("log(r)")) == "Invalid: Contains invalid character: \"r\""
+
    
     assert(validate('4+3*4-1')) == "!4+3*4-1"
     assert(validate('21/3')) == "!21/3"
     assert(validate('2^3')) == "!2^3"
     assert(validate('9++8')) == "!9++8"
     assert(validate('3--1')) == "!3--1"
+    assert(validate('log(5)')) == "!log(5)"
+    assert(validate('exp(4)')) == "!exp(4)"
+    assert(validate('(3*4)+3')) == "!(3*4)+3"
+    assert(validate('(log(3)+4)-2')) == "!(log(3)+4)-2"
+    assert(validate('3+5*exp(4.2)/(5+7)')) == "!3+5*exp(4.2)/(5+7)"
+    assert(validate('(12.344754 + 5) * exp(5)')) == "!(12.344754 + 5) * exp(5)"
+    assert(validate('(634.4982938 - 45.19283473) + log(9)')) == "!(634.4982938 - 45.19283473) + log(9)"
