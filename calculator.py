@@ -125,17 +125,29 @@ def solve(eq: str, dp=3) -> str:
     `dp` refers to how many decimal points are to be shown, defaulting to 3.
     ---
     This section deals with parenthesis by picking the innermost pair and performing calc() on its contents,
-    returning the answer to the same string. This is repeated until no parenthesis are left. calc() is performed once more at the end to account for a lack of parenthesis in the total equation.
+    returning the answer to the same string. This is repeated until no parenthesis are left. calc() is performed once more at the end to account for a lack of
+    parenthesis in the total equation.
 
     e.g.: 8/7^2+5*(8-3)
-    `solve()` starts by finding the first closed bracket [")"] and moving backwards until it finds its opening pair. From there, it takes the substring within the bracket and calculates it using `calc()`.
+    `solve()` starts by finding the first closed bracket [")"] and moving backwards until it finds its opening pair. From there, it takes the substring within 
+    the bracket and calculates it using `calc()`.
 
-    `calc()` takes the substring equation (`eq`) and `normalise()`s it, making it easier to use with the rest of `calc()`. In this case, it takes the '8-3' and checks for a character ahead of the '-'. It finds nothing, so it replaces the '-' with '+-' to force the algorithm into accepting that '3' is negative. This makes no difference here, but for an equation such as '8-3*4', '3' would be taken to be negative, which would be wrong.
+    `calc()` takes the substring equation (`eq`) and `normalise()`s it, making it easier to use with the rest of `calc()`. In this case, it takes the '8-3' and
+    checks for a character ahead of the '-'. It finds nothing, so it replaces the '-' with '+-' to force the algorithm into accepting that '3' is negative. 
+    This makes no difference here, but for an equation such as '8-3*4', '3' would be taken to be negative, which would be wrong.
 
     Next, the function splits up the equation into lists of numbers and operators. 
-    It sees the '-' and recognises that the value ahead of it, namely '3', is negative, and so adds the index of '3' to a list of values to update as negative later (neg_pos). As `normalise()` replaced the '-' with '+-', there is still a '+' remaining in the string, which is added to the list of operators. Then, all operators are removed from the equation string itself, including brackets, so that it can be split up into numbers. Before it is split up however, the character '-' is added to the each index in neg_pos to mark the following number as negative. Finally, the string is split up by the commas added when removing operators into a list of numbers. The operators were removed by replacing them with commas, but the parenthesis were removed outright, with no replacements.
+    It sees the '-' and recognises that the value ahead of it, namely '3', is negative, and so adds the index of '3' to a list of values to update as negative 
+    later (neg_pos). As `normalise()` replaced the '-' with '+-', there is still a '+' remaining in the string, which is added to the list of operators. Then, 
+    all operators are removed from the equation string itself, including brackets, so that it can be split up into numbers. Before it is split up however, the 
+    character '-' is added to the each index in neg_pos to mark the following number as negative. Finally, the string is split up by the commas added when 
+    removing operators into a list of numbers. The operators were removed by replacing them with commas, but the parenthesis were removed outright, with no 
+    replacements.
 
-    Finally, the actual calculation is performed. Going by BIMDAS/BODMAS/PEMDAS (whichever you prefer), the equation is iterated over by finding the highest precedence operator and performing a binary calculation using that operator on the two values either side of it. It then removes the two values from nums (the list of numbers) and the operator from ops (the list of operators) and places the new result in nums at the position of the first value used in the calculation. That is, for example,
+    Finally, the actual calculation is performed. Going by BIMDAS/BODMAS/PEMDAS (whichever you prefer), the equation is iterated over by finding the highest 
+    precedence operator and performing a binary calculation using that operator on the two values either side of it. It then removes the two values from nums 
+    (the list of numbers) and the operator from ops (the list of operators) and places the new result in nums at the position of the first value used in the 
+    calculation. That is, for example,
         - nums = [3, 4, 5]
         - ops = [+, *]
         - a = 4, b = 5, op = '*'
@@ -143,13 +155,17 @@ def solve(eq: str, dp=3) -> str:
         - nums = [3, 20]
         - ops = [+]
 
-    and repeat. This is performed until there is only one value left in nums, which is then returned. The emptiness of ops is assumed due to `validate()` having been performed already before calling `calc()`.
+    and repeat. This is performed until there is only one value left in nums, which is then returned. The emptiness of ops is assumed due to `validate()` 
+    having been performed already before calling `calc()`.
 
     In the case of our example, the returned result is 5, which is placed back into eq, which now looks like this:
 
     8/7^2+5*5
 
-    Note that the parenthesis are removed. Now, as there are no more parenthesis left, the entire equation is entered into `calc()` a final time, just to ensure that no calculation is left undone. The same steps as above are performed, with the calculation finding all operators with precedence 3 ('^') and performing their calculations first, then precedence 2, then precedence 1.  Any operators of equal precedence are used as found (left to right). The details of this are laid out as follows:
+    Note that the parenthesis are removed. Now, as there are no more parenthesis left, the entire equation is entered into `calc()` a final time, just to 
+    ensure that no calculation is left undone. The same steps as above are performed, with the calculation finding all operators with precedence 3 ('^') and 
+    performing their calculations first, then precedence 2, then precedence 1.  Any operators of equal precedence are used as found (left to right). The 
+    details of this are laid out as follows:
         - nums = [8, 7, 2, 5, 5]
         - ops = [/, ^, +, *]
         - prec = 3, so op = ^
@@ -182,9 +198,12 @@ def solve(eq: str, dp=3) -> str:
 
     When exp and log are used, the procedure is slightly different but still generally the same. 
         - When exp is found, the string "exp" is simply replaced with the value of `e`, Euler's constant, and '^', the power operator.
-        - When log is found, the calculation is performed immediately, before the main calculation of the equation string, due to log having no binary operator equivalent. The result is then placed back into the string, replacing log, and the function resumes as normal.
+        - When log is found, the calculation is performed immediately, before the main calculation of the equation string, due to log having no binary operator 
+          equivalent. The result is then placed back into the string, replacing log, and the function resumes as normal.
 
-    One final caveat is the event in which the equation contains a substring similar to 'a-b^c'. It was stated above that 'b' should be made to be negative in the case of '8-3*4', but given that '^' is the highest precedence operator, the numbers it uses must be prioritised over negation. As a result, any substring 'a-b^c' does not pre-negate the value 'b' to avoid misinterpreting the equation. 
+    One final caveat is the event in which the equation contains a substring similar to 'a-b^c'. It was stated above that 'b' should be made to be negative in 
+    the case of '8-3*4', but given that '^' is the highest precedence operator, the numbers it uses must be prioritised over negation. As a result, any 
+    substring 'a-b^c' does not pre-negate the value 'b' to avoid misinterpreting the equation. 
     """
 
     eq = eq.replace(" ", "")  # remove whitespace
