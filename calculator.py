@@ -20,8 +20,7 @@ valid_ops = ["+", "-", "*", "/", "^"]
 valid_chars = ["(", ")", "."]
 order = [["+", "-"], ["*", "/"], ["^"]]
 euler = str(e)  # euler = e = 2.718281828...
-
-
+disp_power_disc = False # display power discrepancy (0^0 returns 1, but should return an error)
 def isNum(a):
     return a >= '0' and a <= '9'
 
@@ -45,6 +44,7 @@ def prec(op):
 
 
 def sub_calc(a, b, op):
+    global disp_power_disc
     match op:
         case "+":
             return a+b
@@ -56,7 +56,7 @@ def sub_calc(a, b, op):
             return a/b if b != 0 else None
         case "^":
             if a == 0 and b == 0:
-                print("NOTE: this is considered undefined on standard calculators.")
+                disp_power_disc = True
             return a**b
         case _:
             return None  # shouldn't be reached due to validate()
@@ -74,9 +74,9 @@ def validate(eq: str):
     if eq[0] in valid_ops and eq[0] != "-":
         return "Invalid: Can only have number or \"-\" (negative) at beginning of expression"
 
-    if "(" in eq and ")" not in eq:
+    if eq.count('(') > eq.count(')'):
         return "Invalid: Unclosed expression"
-    if ")" in eq and "(" not in eq:
+    if eq.count('(') < eq.count(')'):
         return "Invalid: Parenthesis closed before opening"
 
     if eq[-1] in valid_ops and not eq[-1] == ")":
@@ -232,6 +232,10 @@ def normalise(eq: str) -> str:
 
     for i in range(len(eq)):
         if i < len(eq) - 3:
+            if eq[i:i+3] in ("exp", "log"):
+                if i > 0 and isNum(eq[i-1]):
+                    eq = eq[:i] + "*" + eq[i:]
+                    i += 1
             if "exp" in eq[i:i+3]:
                 # exp must use a minimum of 6 characters (e.g. len("exp(a)") == 6)
                 eq = eq[:i] + euler + "^" + eq[i+3:]
