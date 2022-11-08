@@ -47,20 +47,23 @@ def prec(op):
 
 def sub_calc(a, b, op):
     global disp_power_disc
-    match op:
-        case "+":
-            return a+b
-        case "-":
-            return a-b
-        case "*":
-            return a*b
-        case "/":
-            return a/b if b != 0 else None
-        case "^":
-            disp_power_disc = a == 0 and b == 0
-            return a**b
-        case _:
-            return None  # shouldn't be reached due to validate()
+    try:
+        match op:
+            case "+":
+                return a+b
+            case "-":
+                return a-b
+            case "*":
+                return a*b
+            case "/":
+                return a/b if b != 0 else None
+            case "^":
+                disp_power_disc = a == 0 and b == 0
+                return a**b
+            case _:
+                return None  # shouldn't be reached due to validate()
+    except:
+        return "Invalid: Result too large"
 
 
 def validate(eq: str):
@@ -377,6 +380,8 @@ def calc(equation: str) -> str:
                             c = sub_calc(a, b, ops[i])
                             if c == None:
                                 return "Invalid: Division by zero"
+                            if type(c) == str:
+                                return c
                             nums[i] = str(c)
                             [nums.remove(p) for p in nums if p == None]
                             del ops[i]

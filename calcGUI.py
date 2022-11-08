@@ -5,13 +5,13 @@ import calculator as clc
 
 root = tk.Tk()
 # Set up the window
-# root.resizable(width=False, height=False)
 
-window_width = 800
+window_width = 850
 window_height = 400
 dp = 3  # decimal places in the result
 MAX_DP = 50
 MAX_LEN = 65
+wrap_limit = 18
 dark_mode = False
 default_colour = "#F0F0F0"
 dark_colour = "#333333"
@@ -27,7 +27,7 @@ def user_solve():
         clc_result["text"] = empty_response
         clc_error["text"] = ans
     else:
-        clc_result["text"] = wrap(ans, 20)
+        clc_result["text"] = wrap(ans, wrap_limit)
         if clc.disp_power_disc:
             clc_error["text"] = "NOTE: this is considered undefined on standard calculators."
             clc.disp_power_disc = False
@@ -36,7 +36,7 @@ def user_solve():
         if len(clc_result["text"]) > 17 and len(clc_result["text"]) < MAX_LEN: 
             clc_error["text"] = "WARNING: values over 16 digits may return incorrect answers due to floating-point arithmetic error"
         if len(clc_result["text"]) >= MAX_LEN:
-            clc_result["text"] = wrap(("{:e}".format(float(ans))), 20)
+            clc_result["text"] = wrap(("{:e}".format(float(ans))), wrap_limit)
     global dp
     dp = 3
 
@@ -51,7 +51,7 @@ def incr_dp():
     else:
         if dp < MAX_DP:
             dp += 1
-        clc_result["text"] = wrap(clc.solve(eq, dp), 20)
+        clc_result["text"] = wrap(clc.solve(eq, dp), wrap_limit)
         if clc.disp_power_disc:
             clc_error["text"] = "NOTE: this is considered undefined on standard calculators."
             clc.disp_power_disc = False
@@ -60,7 +60,7 @@ def incr_dp():
         if len(clc_result["text"]) > 17 and len(clc_result["text"]) < MAX_LEN: 
             clc_error["text"] = "WARNING: values over 16 digits may return incorrect answers due to floating-point arithmetic error"
         if len(clc_result["text"]) >= MAX_LEN:
-            clc_result["text"] = wrap(("{:e}".format(float(ans))), 20)
+            clc_result["text"] = wrap(("{:e}".format(float(ans))), wrap_limit)
 
 
 
@@ -74,7 +74,7 @@ def decr_dp():
     else:
         if dp > 0:
             dp -= 1
-        clc_result["text"] = wrap(clc.solve(eq, dp), 20)
+        clc_result["text"] = wrap(clc.solve(eq, dp), wrap_limit)
         if clc.disp_power_disc:
             clc_error["text"] = "NOTE: this is considered undefined on standard calculators."
             clc.disp_power_disc = False
@@ -83,7 +83,7 @@ def decr_dp():
         if len(clc_result["text"]) > 17 and len(clc_result["text"]) < MAX_LEN: 
             clc_error["text"] = "WARNING: values over 16 digits may return incorrect answers due to floating-point arithmetic error"
         if len(clc_result["text"]) >= MAX_LEN:
-            clc_result["text"] = wrap(("{:e}".format(float(ans))), 20)
+            clc_result["text"] = wrap(("{:e}".format(float(ans))), wrap_limit)
 
 
 def wrap(string, max_width):
@@ -158,14 +158,15 @@ clc_col_mode = tk.Button(
     text="\N{BLACK SUN WITH RAYS}",
     command=invert_colour_mode,
     width=3,
-    height=2,
+    height=1,
     bg="black",
-    fg=default_colour
+    fg=default_colour,
+    font=("Segoe UI", 15)
 )
 
 clc_calc = tk.Button(
     master=root,
-    text="\N{RIGHTWARDS BLACK ARROW}",
+    text="\N{BLACK RIGHTWARDS ARROW}",
     command=user_solve,
     width=8,
     height=1,
