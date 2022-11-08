@@ -25,27 +25,28 @@ Setting up an X Server generally follows the same steps. In short, they are list
 - Start with no client (to add clients as you please)
 - Disable access control (to allow clients without needing permissions)
 
-Once this has been launched, the calculator will be ready to launch.
+Once this is done, the calculator will be ready to launch.
 
 
 ## To run locally
 If you've downloaded the files locally, you don't need PuTTy or an X Server, though you will need the Python language installed at version 3 or higher (>= 3.7). Instead, you can launch the calculator by navigating to this folder and entering the command:
 
-```python ./calcGUI.py```
+    python ./calcGUI.py
 
 ## To run using a Dockerfile (containerisation)
 If you've pulled this module from Docker Hub, you can launch the calculator by first building the image with 
 
-```docker build -t [image name] .```
+    docker build -t [image name] .
 
 Then you can run the image in a container using
 
-```docker run -ti -d --rm -e DISPLAY=host.docker.internal:0.0 --name [container name] [image name]```
+    docker run -ti -d --rm -e DISPLAY=host.docker.internal:0.0 --name [container name] [image name]
 
 Both the image and container names are arbitrary. 
 
 ## To run from Docker Hub
-To run directly from Docker Hub, you can use the command\
-```docker run -ti -d --rm -e DISPLAY=host.docker.internal:0.0 --name [container name] acc_name/image_name:version_name```
+To run directly from Docker Hub, you can use the command
+
+    docker run -ti -d --rm -e DISPLAY=host.docker.internal:0.0 --name [container name] acc_name/image_name:version_name
 
 Now you can enjoy the calculator :)
